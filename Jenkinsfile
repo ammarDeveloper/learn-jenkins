@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                get url: '', branch: 'main'
+                git url: 'https://github.com/ammarDeveloper/learn-jenkins', branch: 'main'
             }
         }
 
