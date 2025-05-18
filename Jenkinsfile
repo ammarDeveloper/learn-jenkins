@@ -44,10 +44,6 @@ pipeline {
                 }
             }
             steps {
-                // For CDK deployment, you might need AWS CLI
-                sh 'apk add --no-cache python3 py3-pip curl'
-                sh 'pip3 install aws-cdk-lib'
-                
                 dir('cdk') {
                     sh 'npm install -g aws-cdk'
                     sh 'cdk deploy --require-approval never'
