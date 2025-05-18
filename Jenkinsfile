@@ -12,7 +12,7 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Install and Test') {
             agent {
                 docker {
                     image 'node:22-alpine'
@@ -20,21 +20,16 @@ pipeline {
                 }
             }
             steps {
+                // Install dependencies
                 sh 'npm install'
                 dir('cdk') {
                     sh 'npm install'
                 }
-            }
-        }
-
-        stage('Run Tests with Coverge') {
-            steps {
+                
+                // Run tests
                 sh 'npm run test -- --coverage'
-            }
-        }
-
-        stage('Build CDK') {
-            steps {
+                
+                // Build CDK
                 dir('cdk') {
                     sh 'npm run build'
                 }
@@ -42,8 +37,19 @@ pipeline {
         }
 
         stage('Deploy CDK') {
+            agent {
+                docker {
+                    image 'node:22-alpine'
+                    reuseNode true
+                }
+            }
             steps {
+                // For CDK deployment, you might need AWS CLI
+                sh 'apk add --no-cache python3 py3-pip curl'
+                sh 'pip3 install aws-cdk-lib'
+                
                 dir('cdk') {
+                    sh 'npm install -g aws-cdk'
                     sh 'cdk deploy --require-approval never'
                 }
             }
