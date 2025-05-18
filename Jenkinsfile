@@ -22,7 +22,7 @@ pipeline {
             steps {
                 // Install dependencies
                 sh 'npm install'
-                dir('cdk') {
+                dir('.') {
                     sh 'npm install'
                 }
                 
@@ -30,7 +30,7 @@ pipeline {
                 sh 'npm run test -- --coverage'
                 
                 // Build CDK
-                dir('cdk') {
+                dir('.') {
                     sh 'npm run build'
                 }
             }
@@ -44,9 +44,14 @@ pipeline {
                 }
             }
             steps {
-                dir('cdk') {
-                    sh 'npm install -g aws-cdk'
-                    sh 'cdk deploy --require-approval never'
+                withCredentials([
+                    string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    dir('.') {
+                        sh 'ls -la'
+                        sh 'npx cdk deploy --require-approval never'
+                    }
                 }
             }
         }

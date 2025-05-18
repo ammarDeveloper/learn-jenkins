@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/my_project1.ts",
+  "app": "npx ts-node bin/my_project1.ts",
   "watch": {
     "include": [
       "**"

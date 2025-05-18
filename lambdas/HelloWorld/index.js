@@ -1,8 +1,6 @@
-function handler(event, context) {
+exports.handler = async function(event, context) {
     return {
         statusCode: 200,
-        message: 'Hello world'
+        body: JSON.stringify({ message: 'Hello world' }),
     };
-}
-
-module.exports = handler;
+};
