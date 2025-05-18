@@ -2,17 +2,19 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION = 'ap-south-1'
+        AWS_REGION = 'ap-south-1' // Change to your region
     }
 
     stages {
+        // Checkout code
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/ammarDeveloper/learn-jenkins', branch: 'main'
+                git branch: 'test', url: 'https://github.com/ammarDeveloper/learn-jenkins'
             }
         }
 
-        stage('Install and Test') {
+        // Install dependencies and test
+        stage('Install & Test') {
             agent {
                 docker {
                     image 'node:22-alpine'
@@ -20,23 +22,14 @@ pipeline {
                 }
             }
             steps {
-                // Install dependencies
                 sh 'npm install'
-                dir('.') {
-                    sh 'npm install'
-                }
-                
-                // Run tests
-                sh 'npm run test -- --coverage'
-                
-                // Build CDK
-                dir('.') {
-                    sh 'npm run build'
-                }
+                sh 'npm run test'
+                sh 'npm run build'
             }
         }
 
-        stage('Deploy CDK') {
+        // Deploy with CDK
+        stage('Deploy') {
             agent {
                 docker {
                     image 'node:22-alpine'
@@ -48,21 +41,9 @@ pipeline {
                     string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
                     string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
                 ]) {
-                    dir('.') {
-                        sh 'ls -la'
-                        sh 'npx cdk deploy --require-approval never'
-                    }
+                    sh 'npx cdk deploy --require-approval never'
                 }
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Deployed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed.'
         }
     }
 }
